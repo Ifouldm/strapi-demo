@@ -1,0 +1,8 @@
+query allProjects {
+    projects {
+        id
+        title
+        date
+        description
+    }
+}

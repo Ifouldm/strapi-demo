@@ -1,0 +1,23 @@
+query getProject($id: ID!) {
+    project(id: $id) {
+        id
+        title
+        date
+        description
+        categories {
+            title
+        }
+        content {
+            __typename
+            ... on ComponentSectionsRichText {
+                id
+                content
+            }
+        }
+        coverImage {
+            id
+            url
+            alternativeText
+        }
+    }
+}

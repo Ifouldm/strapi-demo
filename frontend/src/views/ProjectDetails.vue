@@ -26,7 +26,11 @@
                 v-for="content in project.content"
                 :key="content.id"
             >
-                {{ content }}
+                <div
+                    class="content"
+                    v-if="content.__typename === 'ComponentSectionsRichText'"
+                    v-html="parseMD(content.content)"
+                ></div>
             </div>
             <time :datetime="project.date">{{
                 useDateFormat(project.date)
@@ -37,21 +41,29 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import useFetch from '../hooks/useFetch';
 import { useRoute } from 'vue-router';
 import { ProjectData } from '../types';
 import { useDateFormat } from '../hooks/useDateFormat';
+import { useQuery, useResult } from '@vue/apollo-composable';
+import getProject from '../graphql/project.query.gql';
+import MarkdownIt from 'markdown-it';
 
 export default defineComponent({
     setup() {
+        const md = new MarkdownIt();
+
+        const parseMD = (text: string) => md.render(text);
+
         const route = useRoute();
 
-        const {
-            error,
-            loading,
-            data: project,
-        } = useFetch<ProjectData>(
-            'http://localhost:1337/projects/' + route.params.id
+        const { error, loading, result } = useQuery(getProject, {
+            id: route.params.id,
+        });
+
+        const project = useResult<any, ProjectData, any>(
+            result,
+            undefined,
+            (data) => data.project
         );
 
         return {
@@ -59,6 +71,7 @@ export default defineComponent({
             loading,
             project,
             useDateFormat,
+            parseMD,
         };
     },
 });

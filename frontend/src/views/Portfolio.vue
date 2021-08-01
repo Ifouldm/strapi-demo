@@ -20,13 +20,15 @@ import { defineComponent } from 'vue';
 import Project from '../components/Project.vue';
 import { useQuery, useResult } from '@vue/apollo-composable';
 import allProjects from '../graphql/allProjects.query.gql';
+import { ProjectData } from '../types';
 
 export default defineComponent({
     components: {
         Project,
     },
     setup() {
-        const { result, loading, error } = useQuery(allProjects);
+        const { result, loading, error } =
+            useQuery<Array<ProjectData>>(allProjects);
 
         const projects = useResult(result);
 
